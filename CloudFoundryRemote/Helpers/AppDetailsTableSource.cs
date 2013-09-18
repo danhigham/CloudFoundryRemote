@@ -15,12 +15,14 @@ namespace CloudFoundryRemote.Helpers.Tables
 		Dictionary<string, Dictionary<string,string>> _tableItems;
 		string cellIdentifier = "TableCell";
 		string[] _sectionKeys;
+		UINavigationController _nav = null;
 
-		public AppDetailsTableSource (Dictionary<string, Dictionary<string,string>> items, string[] sectionKeys)
+		public AppDetailsTableSource (Dictionary<string, Dictionary<string,string>> items, string[] sectionKeys, 
+		                              UINavigationController navigationController)
 		{
 			_tableItems = items;
 			_sectionKeys = sectionKeys;
-
+			_nav = navigationController;
 		}
 		public override int NumberOfSections (UITableView tableView)
 		{
@@ -51,6 +53,7 @@ namespace CloudFoundryRemote.Helpers.Tables
 			if (cell == null)
 				cell = new UITableViewCell (UITableViewCellStyle.Default, cellIdentifier);
 
+			cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			cell.Accessory = UITableViewCellAccessory.None;
 
 			foreach (var sv in cell.Subviews) 
@@ -63,7 +66,8 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 			RectangleF textPos = new RectangleF (120f, 6f, 190f, 25f);
 
-			if (sectionKey == "Actions") {
+			if ((sectionKey == "Actions") || (rowKeyList[indexPath.Row] == "URL")) {
+				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 				cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 				textPos.X -= 20f;
 			}
@@ -81,10 +85,16 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 		{
-//			AppRowEventArgs args = new AppRowEventArgs ();
-//			args.Item = _tableItems [indexPath.Row];
-//
-//			_tableItems [indexPath.Row].RowClick (this, args);
+			string sectionKey = _sectionKeys [indexPath.Section];
+			string[] rowKeyList = new List<string>(_tableItems[sectionKey].Keys).ToArray();
+
+			if (rowKeyList[indexPath.Row] == "URL") {
+				string url = "http://" + _tableItems [sectionKey] [rowKeyList[indexPath.Row]];
+				BrowserViewController bvc = new BrowserViewController (url);
+				if (_nav != null)
+					_nav.PushViewController (bvc, true);
+			}
+
 			tableView.DeselectRow (indexPath, true); // iOS convention is to remove the highlight
 		}
 	}

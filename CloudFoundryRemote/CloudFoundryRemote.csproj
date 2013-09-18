@@ -131,6 +131,10 @@
     <Compile Include="Helpers\AppTableSource.cs" />
     <Compile Include="Helpers\AppDetailsTableSource.cs" />
     <Compile Include="Mono.CFoundry\Models\InstanceStats.cs" />
+    <Compile Include="Screens\BrowserViewController.cs" />
+    <Compile Include="Screens\BrowserViewController.designer.cs">
+      <DependentUpon>BrowserViewController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -139,6 +143,7 @@
     <InterfaceDefinition Include="Screens\SpacesViewController.xib" />
     <InterfaceDefinition Include="Screens\AppsViewController.xib" />
     <InterfaceDefinition Include="Screens\AppDetailViewController.xib" />
+    <InterfaceDefinition Include="Screens\BrowserViewController.xib" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\logo-cloudfoundry.png" />

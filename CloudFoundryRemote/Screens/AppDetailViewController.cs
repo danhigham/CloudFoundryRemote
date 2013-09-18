@@ -54,7 +54,8 @@ namespace CloudFoundryRemote
 
 			var summary = new Dictionary<string, string> ();
 
-			summary.Add ("Guid", _app.Guid);
+//			summary.Add ("Guid", _app.Guid);
+			summary.Add ("URL", _app.Urls.First());
 			summary.Add ("Memory", _app.Memory.ToString() + "M");
 			summary.Add ("Instances", _app.Instances.ToString());
 			summary.Add ("Disk Quota", _app.DiskQuota.ToString() + "M");
@@ -94,8 +95,7 @@ namespace CloudFoundryRemote
 
 			tableData.Add ("Actions", actions);
 
-			return new AppDetailsTableSource (tableData, sectionKeys.ToArray());
-
+			return new AppDetailsTableSource (tableData, sectionKeys.ToArray(), this.NavigationController);
 		}
 	}
 }
