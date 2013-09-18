@@ -129,6 +129,8 @@
       <DependentUpon>AppDetailViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AppTableSource.cs" />
+    <Compile Include="Helpers\AppDetailsTableSource.cs" />
+    <Compile Include="Mono.CFoundry\Models\InstanceStats.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -156,5 +158,6 @@
     <BundleResource Include="Resources\whiteButtonHighlight.png" />
     <BundleResource Include="Resources\Icon%402x.png" />
     <BundleResource Include="Resources\Icon.png" />
+    <BundleResource Include="Resources\please-wait.png" />
   </ItemGroup>
 </Project>

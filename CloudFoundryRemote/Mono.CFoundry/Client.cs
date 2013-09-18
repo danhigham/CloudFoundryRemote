@@ -79,20 +79,43 @@ namespace Mono.CFoundry
 			List<App> apps = new List<App> ();
 			var response = Get (_target + "/v2/spaces/" + spaceGuid + "/summary");
 
-			Console.WriteLine (response);
-
 			foreach (var a in response["apps"])
 				apps.Add (new App () {
 					Guid = a["guid"].ToString(),
-					Name = a["name"].ToString()
+					Name = a["name"].ToString(),
+					Urls = a["urls"].ToObject<string[]>(),
+					Memory = int.Parse(a["memory"].ToString()),
+					Instances = int.Parse(a["instances"].ToString()),
+					DiskQuota = int.Parse(a["disk_quota"].ToString()),
+					State = a["state"].ToString(),
+					DetectedBuildpack = a["detected_buildpack"].ToString()
 				});
 			return apps;
 		}
 
-		public App GetAppDetail (string appGuid)
+		public List<InstanceStats> GetInstanceStats (string appGuid)
 		{
-			throw new NotImplementedException ();
-			//var response = Get (_target + "/v2/spaces/" + spaceGuid + "/summary");
+			List<InstanceStats> instanceStats = new List<InstanceStats> ();
+
+			var response = Get (_target + "/v2/apps/" +appGuid + "/stats");
+			foreach (var instance in response) {
+				instanceStats.Add (new InstanceStats () {
+					InstanceId = instance.Key,
+					State = instance.Value["state"].ToString(),
+					Host = instance.Value["stats"]["host"].ToString(),
+					Port = int.Parse(instance.Value["stats"]["port"].ToString()),
+					Uptime = int.Parse(instance.Value["stats"]["uptime"].ToString()),
+					MemoryQuota = int.Parse(instance.Value["stats"]["mem_quota"].ToString()),
+					DiskQuota = int.Parse(instance.Value["stats"]["disk_quota"].ToString()),
+					FDSQuota = int.Parse(instance.Value["stats"]["fds_quota"].ToString()),
+					TimeUsage = instance.Value["stats"]["usage"]["time"].ToString(),
+					CPUUsage = float.Parse(instance.Value["stats"]["usage"]["cpu"].ToString()),
+					MemoryUsage = int.Parse(instance.Value["stats"]["usage"]["mem"].ToString()),
+					DiskUsage = int.Parse(instance.Value["stats"]["usage"]["disk"].ToString())
+				});
+			}
+
+			return instanceStats;
 		}
 
 		private void GetEndPointInfo() 
@@ -156,7 +179,9 @@ namespace Mono.CFoundry
 			readStream.Close();
 			response.Close(); 
 
-			return JObject.Parse (sb.ToString ());
+			var jObj = JObject.Parse (sb.ToString ());
+			Console.WriteLine (jObj);
+			return jObj;
 		}
 	}
 }

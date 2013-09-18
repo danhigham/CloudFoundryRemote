@@ -57,12 +57,24 @@ namespace CloudFoundryRemote
 
 			btnLogin.TouchUpInside += (sender, e) => {
 
-				var client = new Mono.CFoundry.Client ();
-				//client.Login (txtUsername.Text, txtPassword.Text);
-				client.Login("dhigham@gopivotal.com", "knife party bonfire");
+				UIView pleaseWait = null;
 
-				OrgsViewController orgsViewController = new OrgsViewController(client);
-				this.NavigationController.PushViewController(orgsViewController, true);
+				pleaseWait = VisualHelper.ShowPleaseWait("Connecting...", View, () => {
+
+					var client = new Mono.CFoundry.Client ();
+					//client.Login (txtUsername.Text, txtPassword.Text);
+					client.Login("dhigham@gopivotal.com", "knife party bonfire");
+	
+					OrgsViewController orgsViewController = new OrgsViewController(client);
+
+					if (pleaseWait != null)
+						VisualHelper.HidePleaseWait(pleaseWait, View, () => {
+							pleaseWait.RemoveFromSuperview ();
+							this.NavigationController.PushViewController(orgsViewController, true);
+						});
+
+				});
+
 
 			};
 		}

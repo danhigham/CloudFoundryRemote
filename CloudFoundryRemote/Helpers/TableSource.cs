@@ -43,6 +43,7 @@ namespace CloudFoundryRemote.Helpers.Tables
 				cell = new UITableViewCell (UITableViewCellStyle.Default, cellIdentifier);
 
 			cell.TextLabel.Text = _tableItems[indexPath.Row].Caption;
+			cell.TextLabel.TextColor = UIColor.DarkGray;
 
 			if (_tableItems [indexPath.Row].RowClick != null) 
 				cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
@@ -59,40 +60,29 @@ namespace CloudFoundryRemote.Helpers.Tables
 			tableView.DeselectRow (indexPath, true); // iOS convention is to remove the highlight
 		}
 
-		public override void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, MonoTouch.Foundation.NSIndexPath indexPath)
-		{
-			switch (editingStyle) {
-
-			case UITableViewCellEditingStyle.Delete:
-
-				var itemToRemove = _tableItems [indexPath.Row];
-
-				if (itemToRemove.RowDelete != null) {
-					RowEventArgs args = new RowEventArgs () {Item = itemToRemove};
-					itemToRemove.RowDelete (this, args);
-				}
-
-				var tempList = new List<TableSourceItem> (_tableItems);
-				tempList.RemoveAt (indexPath.Row);
-				_tableItems = tempList.ToArray();
-
-				// delete the row from the table
-				tableView.DeleteRows (new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Fade);
-				break;
-				case UITableViewCellEditingStyle.None:
-				Console.WriteLine ("CommitEditingStyle:None called");
-				break;
-			}
-		}
-
-//		public override bool CanEditRow (UITableView tableView, NSIndexPath indexPath)
+//		public override void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, MonoTouch.Foundation.NSIndexPath indexPath)
 //		{
-//			return true; // return false if you wish to disable editing for a specific indexPath or for all rows
-//		}
-		 	
-//		public override string TitleForDeleteConfirmation (UITableView tableView, NSIndexPath indexPath)
-//		{   // Optional - default text is 'Delete'
-//			return "Trash (" + _tableItems[indexPath.Row] + ")";
+//			switch (editingStyle) {
+//
+//			case UITableViewCellEditingStyle.Delete:
+//
+//				var itemToRemove = _tableItems [indexPath.Row];
+//
+//				if (itemToRemove.RowDelete != null) {
+//					RowEventArgs args = new RowEventArgs () {Item = itemToRemove};
+//					itemToRemove.RowDelete (this, args);
+//				}
+//
+//				var tempList = new List<TableSourceItem> (_tableItems);
+//				tempList.RemoveAt (indexPath.Row);
+//				_tableItems = tempList.ToArray();
+//
+//				// delete the row from the table
+//				tableView.DeleteRows (new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Fade);
+//				break;
+//				case UITableViewCellEditingStyle.None:
+//				break;
+//			}
 //		}
 	}
 }
