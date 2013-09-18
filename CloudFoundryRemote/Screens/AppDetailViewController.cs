@@ -37,7 +37,10 @@ namespace CloudFoundryRemote
 		{
 			base.ViewDidLoad ();
 
-//			tblDetail.Source = appDataAsTableSource ();
+			UITableView tblDetail = new UITableView (new RectangleF (0, 0, View.Frame.Width, View.Frame.Height), UITableViewStyle.Grouped);
+			Add (tblDetail);
+
+			tblDetail.Source = appDataAsTableSource ();
 		}
 
 		private AppDetailsTableSource appDataAsTableSource()
@@ -70,7 +73,7 @@ namespace CloudFoundryRemote
 				TimeSpan t = TimeSpan.FromSeconds(s.Uptime);
 				string uptime = string.Format("{0:D2}h:{1:D2}m:{2:D2}s", t.Hours, t.Minutes, t.Seconds);
 
-				status.Add ("Uptime", uptime); // TODO: change to readable time!
+				status.Add ("Uptime", uptime);
 //				status.Add ("Memory Quota", s.Uptime.ToString ());
 //				status.Add ("Disk Quota", s.DiskQuota.ToString ());
 //				status.Add ("FDS Quota", s.FDSQuota.ToString ());
@@ -83,9 +86,13 @@ namespace CloudFoundryRemote
 			});
 
 			var actions = new Dictionary<string, string> ();
+			actions.Add ("Scale", "Scale the application");
+			actions.Add ("View Logs", "View the apps log files");
+			actions.Add ("Browse Files", "Browse the apps files");
+			actions.Add ("Stop / Start", "Start / Stop");
+			actions.Add ("Restart", "Restart the app");
+
 			tableData.Add ("Actions", actions);
-
-
 
 			return new AppDetailsTableSource (tableData, sectionKeys.ToArray());
 

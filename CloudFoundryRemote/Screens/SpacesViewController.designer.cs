@@ -12,15 +12,9 @@ namespace CloudFoundryRemote
 	[Register ("SpacesViewController")]
 	partial class SpacesViewController
 	{
-		[Outlet]
-		MonoTouch.UIKit.UITableView tblSpaces { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (tblSpaces != null) {
-				tblSpaces.Dispose ();
-				tblSpaces = null;
-			}
 		}
 	}
 }

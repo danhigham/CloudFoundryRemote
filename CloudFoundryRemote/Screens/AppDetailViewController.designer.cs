@@ -12,15 +12,9 @@ namespace CloudFoundryRemote
 	[Register ("AppDetailViewController")]
 	partial class AppDetailViewController
 	{
-		[Outlet]
-		MonoTouch.UIKit.UITableView tblDetail { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (tblDetail != null) {
-				tblDetail.Dispose ();
-				tblDetail = null;
-			}
 		}
 	}
 }

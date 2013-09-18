@@ -35,7 +35,11 @@ namespace CloudFoundryRemote
 			base.ViewDidLoad ();
 			
 			// Perform any additional setup after loading the view, typically from a nib.
+			UITableView tblSpaces = new UITableView (new RectangleF (0, 0, View.Frame.Width, View.Frame.Height), UITableViewStyle.Grouped);
+			Add (tblSpaces);
+
 			tblSpaces.Source = _tblSource;
+
 		}
 
 		private UITableViewSource SpacesAsTableView(List<Space> spaces)

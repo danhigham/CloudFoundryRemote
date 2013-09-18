@@ -16,6 +16,8 @@ namespace Mono.CFoundry
 		string _uaaTarget;
 		string _authToken = null;
 		string _authType = null;
+		string _refreshToken = null;
+		DateTime _tokenExpiresAt = DateTime.Now;
 
 		public Client ()
 		{
@@ -36,12 +38,10 @@ namespace Mono.CFoundry
 			string loginURL = _uaaTarget + "/oauth/token";
 			WebHeaderCollection headers = new WebHeaderCollection ();
 
-//			headers.Add(HttpRequestHeader.Accept, "application/json;charset=utf-8");
 			headers.Add(HttpRequestHeader.Authorization, "Basic Y2Y6");
 
-			var loginResponse = Post (loginURL, headers, "grant_type=password&username=" + username + "&password=" + password);
-			_authToken = loginResponse ["access_token"].ToString ();
-			_authType = loginResponse ["token_type"].ToString ();
+			var response = Post (loginURL, headers, "grant_type=password&username=" + username + "&password=" + password);
+			SetTokenFromResponse (response);
 		}
 
 		public List<Organization> GetOrgs()
@@ -124,23 +124,53 @@ namespace Mono.CFoundry
 			_uaaTarget = response["authorization_endpoint"].ToString();
 		}
 
+		private void RefreshToken() 
+		{
+			string loginURL = _uaaTarget + "/oauth/token";
+			WebHeaderCollection headers = new WebHeaderCollection ();
+
+			headers.Add(HttpRequestHeader.Authorization, "Basic Y2Y6");
+
+			var response = HttpRequest (loginURL, headers, "POST", "grant_type=refresh_token&refresh_token=" + _refreshToken);
+			SetTokenFromResponse (response);
+		}
+
+		private void SetTokenFromResponse(JObject response)
+		{
+			_authToken = response ["access_token"].ToString ();
+			_refreshToken = response ["refresh_token"].ToString ();
+			_authType = response ["token_type"].ToString ();
+
+			int expiresInSeconds = int.Parse (response ["expires_in"].ToString ());
+			_tokenExpiresAt = DateTime.Now.AddSeconds (expiresInSeconds);
+
+			Console.WriteLine ("Current token expires at " + _tokenExpiresAt);
+		}
+
 		private JObject Get(string url, WebHeaderCollection headers = null) 
 		{
+			if ((DateTime.Now > _tokenExpiresAt) && (_refreshToken != null))
+				RefreshToken ();
+
 			if (headers == null)
 				headers = new WebHeaderCollection ();
 			if (_authToken != null)
 				headers.Add (HttpRequestHeader.Authorization, _authType + " " + _authToken);
 
-			return(request(url, headers, "GET"));
+			return(HttpRequest(url, headers, "GET"));
 		}
 
 		private JObject Post(string url, WebHeaderCollection headers, string body)
 		{
-			return(request(url, headers, "POST", body));
+			if ((DateTime.Now > _tokenExpiresAt) && (_refreshToken != null))
+				RefreshToken ();
+
+			return(HttpRequest(url, headers, "POST", body));
 		}
 
-		private JObject request(string url, WebHeaderCollection headers, string method, string body = null)
+		private JObject HttpRequest(string url, WebHeaderCollection headers, string method, string body = null)
 		{
+
 			WebRequest request = WebRequest.Create (url);
 			request.Method = method;
 			request.Headers = headers;

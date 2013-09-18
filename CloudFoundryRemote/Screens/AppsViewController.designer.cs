@@ -12,15 +12,9 @@ namespace CloudFoundryRemote
 	[Register ("AppsViewController")]
 	partial class AppsViewController
 	{
-		[Outlet]
-		MonoTouch.UIKit.UITableView tblApps { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (tblApps != null) {
-				tblApps.Dispose ();
-				tblApps = null;
-			}
 		}
 	}
 }

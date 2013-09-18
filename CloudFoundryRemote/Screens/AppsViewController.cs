@@ -33,8 +33,10 @@ namespace CloudFoundryRemote
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			
-			// Perform any additional setup after loading the view, typically from a nib.
+
+			UITableView tblApps = new UITableView (new RectangleF (0, 0, View.Frame.Width, View.Frame.Height), UITableViewStyle.Grouped);
+			Add (tblApps);
+
 			tblApps.Source = _tblSource;
 		}
 

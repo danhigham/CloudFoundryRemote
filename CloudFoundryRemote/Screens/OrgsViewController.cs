@@ -34,6 +34,9 @@ namespace CloudFoundryRemote
 		{
 			base.ViewDidLoad ();
 
+			UITableView tblOrgs = new UITableView (new RectangleF (0, 0, View.Frame.Width, View.Frame.Height), UITableViewStyle.Grouped);
+			Add (tblOrgs);
+
 			tblOrgs.Source = _tblSource;
 			// Perform any additional setup after loading the view, typically from a nib.
 		}

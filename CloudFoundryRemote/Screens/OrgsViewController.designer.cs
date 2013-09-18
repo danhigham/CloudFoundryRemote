@@ -12,15 +12,9 @@ namespace CloudFoundryRemote
 	[Register ("OrgsViewController")]
 	partial class OrgsViewController
 	{
-		[Outlet]
-		MonoTouch.UIKit.UITableView tblOrgs { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (tblOrgs != null) {
-				tblOrgs.Dispose ();
-				tblOrgs = null;
-			}
 		}
 	}
 }

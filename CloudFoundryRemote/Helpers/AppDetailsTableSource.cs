@@ -51,6 +51,8 @@ namespace CloudFoundryRemote.Helpers.Tables
 			if (cell == null)
 				cell = new UITableViewCell (UITableViewCellStyle.Default, cellIdentifier);
 
+			cell.Accessory = UITableViewCellAccessory.None;
+
 			foreach (var sv in cell.Subviews) 
 				if (sv.GetType() == typeof(UITextView)) sv.RemoveFromSuperview ();
 
@@ -59,18 +61,21 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 			cell.TextLabel.Text = rowKeyList[indexPath.Row];
 
-			UITextView rowValue = new UITextView (new RectangleF (120f, 10f, 190f, 20f));
+			RectangleF textPos = new RectangleF (120f, 6f, 190f, 25f);
+
+			if (sectionKey == "Actions") {
+				cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+				textPos.X -= 20f;
+			}
+
+			UITextView rowValue = new UITextView (textPos);
 			rowValue.Text = _tableItems [sectionKey] [rowKeyList[indexPath.Row]];
+			rowValue.Editable = false;
 			rowValue.BackgroundColor = UIColor.FromRGBA (0, 0, 0, 0);
 			rowValue.TextAlignment = UITextAlignment.Right;
 			rowValue.ScrollEnabled = false;
 			cell.AddSubview (rowValue);
 
-			//cell.TextLabel.TextColor = UIColor.DarkGray;
-//
-//			if (_tableItems [indexPath.Row].RowClick != null) 
-//				cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
-//
 			return cell;
 		}
 
