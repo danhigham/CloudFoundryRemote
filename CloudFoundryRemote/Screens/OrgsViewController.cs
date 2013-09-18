@@ -5,6 +5,7 @@ using MonoTouch.UIKit;
 using System.Collections.Generic;
 using Mono.CFoundry.Models;
 using CloudFoundryRemote.Helpers.Tables;
+using CloudFoundryRemote.Helpers;
 
 namespace CloudFoundryRemote
 {
@@ -13,11 +14,10 @@ namespace CloudFoundryRemote
 		UITableViewSource _tblSource;
 		Mono.CFoundry.Client _client;
 
-		public OrgsViewController (Mono.CFoundry.Client client) : base ("OrgsViewController", null)
+		public OrgsViewController (Mono.CFoundry.Client client, List<Organization> orgs) : base ("OrgsViewController", null)
 		{
 			this.Title = "Organizations";
 
-			List<Organization> orgs = client.GetOrgs();
 			_client = client;
 			_tblSource = OrgsAsTableView(orgs);
 		}
@@ -55,8 +55,19 @@ namespace CloudFoundryRemote
 
 						var args = (RowEventArgs)e;
 
-						SpacesViewController spaceViewController = new SpacesViewController(_client, args.Item.Guid);
-						this.NavigationController.PushViewController(spaceViewController, true);
+						UIView pleaseWait = null;
+
+						pleaseWait = VisualHelper.ShowPleaseWait("Wait...", View, () => {
+
+							SpacesViewController spaceViewController = new SpacesViewController(_client, _client.GetSpaces(args.Item.Guid));
+
+							if (pleaseWait != null)
+								VisualHelper.HidePleaseWait(pleaseWait, View, () => {
+									pleaseWait.RemoveFromSuperview ();
+									this.NavigationController.PushViewController(spaceViewController, true);
+								});
+						});
+
 					}
 				});
 

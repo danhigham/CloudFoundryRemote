@@ -62,17 +62,18 @@ namespace CloudFoundryRemote.Helpers
 			UIView pleaseWaitView = new UIView (new RectangleF (0, 0 - callingView.Frame.Height, callingView.Frame.Width, callingView.Frame.Height));
 			pleaseWaitView.BackgroundColor = new UIColor (0, 0, 0, 0);
 
-			UIImageView pleaseWait = new UIImageView (new RectangleF (35f, 100f, 250f, 180f));
+			UIImageView pleaseWait = new UIImageView (
+				new RectangleF ((callingView.Frame.Width / 2) - 67f, (callingView.Frame.Height / 2) - 45f, 125f, 90f));
 
-			UITextView text = new UITextView (new RectangleF (0, 70f, 250f, 60f));
+			UITextView text = new UITextView (new RectangleF (0f, 10f, 125f, 60f));
 			text.BackgroundColor = new UIColor (0, 0, 0, 0);
 			text.TextAlignment = UITextAlignment.Center;
 			text.Text = message;
 			text.TextColor = UIColor.FromRGB(230f, 230f, 230f);
-			text.Font = UIFont.BoldSystemFontOfSize (32f);
+			text.Font = UIFont.BoldSystemFontOfSize (16f);
 
-			UIActivityIndicatorView spinner = new UIActivityIndicatorView (new RectangleF (105f, 40f, 30f, 30f));
-			spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge;
+			UIActivityIndicatorView spinner = new UIActivityIndicatorView (new RectangleF (50f, 50f, 30f, 30f));
+			spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.White;
 			spinner.StartAnimating ();
 
 			pleaseWait.AddSubview (spinner);

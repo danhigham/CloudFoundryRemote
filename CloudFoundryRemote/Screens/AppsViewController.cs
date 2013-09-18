@@ -5,6 +5,7 @@ using MonoTouch.UIKit;
 using System.Collections.Generic;
 using Mono.CFoundry.Models;
 using CloudFoundryRemote.Helpers.Tables;
+using CloudFoundryRemote.Helpers;
 
 namespace CloudFoundryRemote
 {
@@ -13,11 +14,11 @@ namespace CloudFoundryRemote
 		UITableViewSource _tblSource;
 		Mono.CFoundry.Client _client;
 
-		public AppsViewController (Mono.CFoundry.Client client, string spaceGuid) : base ("AppsViewController", null)
+		public AppsViewController (Mono.CFoundry.Client client, List<App> apps) : base ("AppsViewController", null)
 		{
 			this.Title = "Applications";
 
-			List<App> apps = client.GetApps(spaceGuid);
+
 			_client = client;
 			_tblSource = AppsAsTableView(apps);
 		}
@@ -53,8 +54,19 @@ namespace CloudFoundryRemote
 					RowClick = (sender, e) => {
 						var args = (AppRowEventArgs)e;
 
-						AppDetailViewController appDetailViewController = new AppDetailViewController(_client, args.Item.App);
-						this.NavigationController.PushViewController(appDetailViewController, true);
+						UIView pleaseWait = null;
+
+						pleaseWait = VisualHelper.ShowPleaseWait("Wait...", View, () => {
+
+							AppDetailViewController appDetailViewController = 
+								new AppDetailViewController(_client, args.Item.App, _client.GetInstanceStats (args.Item.App.Guid));
+
+							if (pleaseWait != null)
+								VisualHelper.HidePleaseWait(pleaseWait, View, () => {
+									pleaseWait.RemoveFromSuperview ();
+									this.NavigationController.PushViewController(appDetailViewController, true);
+								});
+						});
 					}
 				});
 

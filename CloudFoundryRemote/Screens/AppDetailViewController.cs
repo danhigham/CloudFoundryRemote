@@ -15,12 +15,12 @@ namespace CloudFoundryRemote
 		App _app;
 		List<InstanceStats> _stats;
 
-		public AppDetailViewController (Mono.CFoundry.Client client, App app) : base ("AppDetailViewController", null)
+		public AppDetailViewController (Mono.CFoundry.Client client, App app, List<InstanceStats> stats) : base ("AppDetailViewController", null)
 		{
 
 			this.Title = app.Name;
 			_app = app;
-			_stats = client.GetInstanceStats (app.Guid);
+			_stats = stats;
 
 			_client = client;
 		}

@@ -64,10 +64,11 @@ namespace CloudFoundryRemote
 					var client = new Mono.CFoundry.Client ();
 					//client.Login (txtUsername.Text, txtPassword.Text);
 					client.Login("dhigham@gopivotal.com", "knife party bonfire");
-	
-					OrgsViewController orgsViewController = new OrgsViewController(client);
+
+					OrgsViewController orgsViewController = new OrgsViewController(client, client.GetOrgs());
 
 					if (pleaseWait != null)
+
 						VisualHelper.HidePleaseWait(pleaseWait, View, () => {
 							pleaseWait.RemoveFromSuperview ();
 							this.NavigationController.PushViewController(orgsViewController, true);

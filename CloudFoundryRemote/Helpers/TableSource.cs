@@ -47,7 +47,7 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 			if (_tableItems [indexPath.Row].RowClick != null) 
 				cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
-
+				
 			return cell;
 		}
 
