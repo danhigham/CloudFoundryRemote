@@ -53,11 +53,14 @@ namespace CloudFoundryRemote.Helpers.Tables
 			if (cell == null)
 				cell = new UITableViewCell (UITableViewCellStyle.Default, cellIdentifier);
 
+
 			cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			cell.Accessory = UITableViewCellAccessory.None;
 
-			foreach (var sv in cell.Subviews) 
-				if (sv.GetType() == typeof(UITextView)) sv.RemoveFromSuperview ();
+			foreach (var subView in cell.Subviews[0].Subviews) 
+				if (subView is UITextView)
+					subView.RemoveFromSuperview ();
+			
 
 			string sectionKey = _sectionKeys [indexPath.Section];
 			string[] rowKeyList = new List<string>(_tableItems[sectionKey].Keys).ToArray();
@@ -97,6 +100,7 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 			tableView.DeselectRow (indexPath, true); // iOS convention is to remove the highlight
 		}
+
 	}
 }
 

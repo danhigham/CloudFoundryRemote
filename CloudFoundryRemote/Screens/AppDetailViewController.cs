@@ -37,7 +37,13 @@ namespace CloudFoundryRemote
 		{
 			base.ViewDidLoad ();
 
-			UITableView tblDetail = new UITableView (new RectangleF (0, 0, View.Frame.Width, View.Frame.Height), UITableViewStyle.Grouped);
+
+			UITableView tblDetail = new UITableView (new RectangleF (0, 40f, View.Frame.Width, View.Frame.Height + 20f), UITableViewStyle.Grouped);
+
+			UIImageView bgView = new UIImageView (tblDetail.Frame);
+			bgView.BackgroundColor = UIColor.FromPatternImage (new UIImage ("stripe_back.png"));
+			tblDetail.BackgroundView = bgView;
+
 			Add (tblDetail);
 
 			tblDetail.Source = appDataAsTableSource ();
@@ -72,7 +78,7 @@ namespace CloudFoundryRemote
 				status.Add ("Port", s.Port.ToString ());
 
 				TimeSpan t = TimeSpan.FromSeconds(s.Uptime);
-				string uptime = string.Format("{0:D2}h:{1:D2}m:{2:D2}s", t.Hours, t.Minutes, t.Seconds);
+				string uptime = string.Format("{0:D2}d:{1:D2}h:{2:D2}m:{3:D2}s", t.Days, t.Hours, t.Minutes, t.Seconds);
 
 				status.Add ("Uptime", uptime);
 //				status.Add ("Memory Quota", s.Uptime.ToString ());

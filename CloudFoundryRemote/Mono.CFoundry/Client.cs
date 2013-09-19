@@ -99,20 +99,26 @@ namespace Mono.CFoundry
 
 			var response = Get (_target + "/v2/apps/" +appGuid + "/stats");
 			foreach (var instance in response) {
-				instanceStats.Add (new InstanceStats () {
+
+				var instanceStat = new InstanceStats () {
 					InstanceId = instance.Key,
-					State = instance.Value["state"].ToString(),
-					Host = instance.Value["stats"]["host"].ToString(),
-					Port = int.Parse(instance.Value["stats"]["port"].ToString()),
-					Uptime = int.Parse(instance.Value["stats"]["uptime"].ToString()),
-					MemoryQuota = int.Parse(instance.Value["stats"]["mem_quota"].ToString()),
-					DiskQuota = int.Parse(instance.Value["stats"]["disk_quota"].ToString()),
-					FDSQuota = int.Parse(instance.Value["stats"]["fds_quota"].ToString()),
-					TimeUsage = instance.Value["stats"]["usage"]["time"].ToString(),
-					CPUUsage = float.Parse(instance.Value["stats"]["usage"]["cpu"].ToString()),
-					MemoryUsage = int.Parse(instance.Value["stats"]["usage"]["mem"].ToString()),
-					DiskUsage = int.Parse(instance.Value["stats"]["usage"]["disk"].ToString())
-				});
+					State = instance.Value["state"].ToString()
+				};
+
+				if (instanceStat.State == "RUNNING") {
+					instanceStat.Host = instance.Value ["stats"] ["host"].ToString ();
+					instanceStat.Port = int.Parse (instance.Value ["stats"] ["port"].ToString ());
+					instanceStat.Uptime = int.Parse (instance.Value ["stats"] ["uptime"].ToString ());
+					instanceStat.MemoryQuota = int.Parse (instance.Value ["stats"] ["mem_quota"].ToString ());
+					instanceStat.DiskQuota = int.Parse (instance.Value ["stats"] ["disk_quota"].ToString ());
+					instanceStat.FDSQuota = int.Parse (instance.Value ["stats"] ["fds_quota"].ToString ());
+					instanceStat.TimeUsage = instance.Value ["stats"] ["usage"] ["time"].ToString ();
+					instanceStat.CPUUsage = float.Parse (instance.Value ["stats"] ["usage"] ["cpu"].ToString ());
+					instanceStat.MemoryUsage = int.Parse (instance.Value ["stats"] ["usage"] ["mem"].ToString ());
+					instanceStat.DiskUsage = int.Parse (instance.Value ["stats"] ["usage"] ["disk"].ToString ());
+				}
+
+				instanceStats.Add (instanceStat);
 			}
 
 			return instanceStats;

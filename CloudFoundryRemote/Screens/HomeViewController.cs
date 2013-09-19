@@ -35,7 +35,7 @@ namespace CloudFoundryRemote
 			VisualHelper.SetTextFieldPadding (txtPassword);
 			VisualHelper.SetTextFieldPadding (txtTarget);
 
-			VisualHelper.SetGreyButton (btnLogin);
+//			VisualHelper.SetGreyButton (btnLogin);
 
 			txtTarget.Text = "api.run.pivotal.io";
 			txtUsername.BecomeFirstResponder ();

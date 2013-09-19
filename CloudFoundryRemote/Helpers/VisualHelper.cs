@@ -69,11 +69,11 @@ namespace CloudFoundryRemote.Helpers
 			text.BackgroundColor = new UIColor (0, 0, 0, 0);
 			text.TextAlignment = UITextAlignment.Center;
 			text.Text = message;
-			text.TextColor = UIColor.FromRGB(230f, 230f, 230f);
+			text.TextColor = UIColor.DarkGray;
 			text.Font = UIFont.BoldSystemFontOfSize (16f);
 
-			UIActivityIndicatorView spinner = new UIActivityIndicatorView (new RectangleF (50f, 50f, 30f, 30f));
-			spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.White;
+			UIActivityIndicatorView spinner = new UIActivityIndicatorView (new RectangleF ((pleaseWait.Frame.Width / 2) - 15f, 50f, 30f, 30f));
+			spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
 			spinner.StartAnimating ();
 
 			pleaseWait.AddSubview (spinner);
