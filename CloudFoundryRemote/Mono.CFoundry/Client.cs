@@ -46,82 +46,68 @@ namespace Mono.CFoundry
 
 		public List<Organization> GetOrgs()
 		{
-			List<Organization> orgs = new List<Organization> ();
-
+			var orgs = new List<Organization> ();
 			var response = Get(_target + "/v2/organizations?inline-relations-depth=0");
-
-			foreach (var o in response["resources"])
-				orgs.Add (new Organization () { 
-					Guid = o["metadata"]["guid"].ToString(),
-					Name = o["entity"]["name"].ToString(),
-					SpacesURL = o["entity"]["spaces_url"].ToString()
-				});
+			foreach (var o in response["resources"]) orgs.Add (Organization.FromJToken(o));
 
 			return orgs;
 		}
 
 		public List<Space> GetSpaces(string orgGuid)
 		{
-			List<Space> spaces = new List<Space> ();
-
+			var spaces = new List<Space> ();
 			var response = Get (_target + "/v2/organizations/" + orgGuid + "/spaces");
-			foreach (var s in response["resources"])
-				spaces.Add (new Space () {
-					Guid = s["metadata"]["guid"].ToString(),
-					Name = s["entity"]["name"].ToString()
-				});
+			foreach (var s in response["resources"]) spaces.Add (Space.FromJToken (s));
 
 			return spaces;
 		}
 
 		public List<App> GetApps (string spaceGuid)
 		{
-			List<App> apps = new List<App> ();
+			var apps = new List<App> ();
 			var response = Get (_target + "/v2/spaces/" + spaceGuid + "/summary");
+			foreach (var a in response["apps"]) apps.Add (App.FromJToken (a));
 
-			foreach (var a in response["apps"])
-				apps.Add (new App () {
-					Guid = a["guid"].ToString(),
-					Name = a["name"].ToString(),
-					Urls = a["urls"].ToObject<string[]>(),
-					Memory = int.Parse(a["memory"].ToString()),
-					Instances = int.Parse(a["instances"].ToString()),
-					DiskQuota = int.Parse(a["disk_quota"].ToString()),
-					State = a["state"].ToString(),
-					DetectedBuildpack = a["detected_buildpack"].ToString()
-				});
 			return apps;
+		}
+
+		public App GetApp (string guid)
+		{
+			var response = Get (_target + "/v2/apps/" + guid + "/summary");
+			return App.FromJObject(response);
 		}
 
 		public List<InstanceStats> GetInstanceStats (string appGuid)
 		{
 			List<InstanceStats> instanceStats = new List<InstanceStats> ();
-
 			var response = Get (_target + "/v2/apps/" +appGuid + "/stats");
-			foreach (var instance in response) {
-
-				var instanceStat = new InstanceStats () {
-					InstanceId = instance.Key,
-					State = instance.Value["state"].ToString()
-				};
-
-				if (instanceStat.State == "RUNNING") {
-					instanceStat.Host = instance.Value ["stats"] ["host"].ToString ();
-					instanceStat.Port = int.Parse (instance.Value ["stats"] ["port"].ToString ());
-					instanceStat.Uptime = int.Parse (instance.Value ["stats"] ["uptime"].ToString ());
-					instanceStat.MemoryQuota = int.Parse (instance.Value ["stats"] ["mem_quota"].ToString ());
-					instanceStat.DiskQuota = int.Parse (instance.Value ["stats"] ["disk_quota"].ToString ());
-					instanceStat.FDSQuota = int.Parse (instance.Value ["stats"] ["fds_quota"].ToString ());
-					instanceStat.TimeUsage = instance.Value ["stats"] ["usage"] ["time"].ToString ();
-					instanceStat.CPUUsage = float.Parse (instance.Value ["stats"] ["usage"] ["cpu"].ToString ());
-					instanceStat.MemoryUsage = int.Parse (instance.Value ["stats"] ["usage"] ["mem"].ToString ());
-					instanceStat.DiskUsage = int.Parse (instance.Value ["stats"] ["usage"] ["disk"].ToString ());
-				}
-
-				instanceStats.Add (instanceStat);
-			}
+			foreach (var instance in response) instanceStats.Add (InstanceStats.FromJTokenHash (instance));
 
 			return instanceStats;
+		}
+
+		public JObject Scale(string appGuid, int memory, int instances)
+		{
+			string requestBody = "{\"instances\":" + instances + ",\"memory\":" + memory + "\"}";
+			string url = _target + "/v2/apps/" + appGuid;
+
+			return Put (url, requestBody);
+		}
+
+		public JObject Stop(string appGuid)
+		{
+			string requestBody = "{\"state\":\"STOPPED\"}";
+			string url = _target + "/v2/apps/" + appGuid;
+
+			return Put (url, requestBody);
+		}
+
+		public JObject Start(string appGuid)
+		{
+			string requestBody = "{\"console\":true,\"state\":\"STARTED\"}";
+			string url = _target + "/v2/apps/" + appGuid;
+
+			return Put (url, requestBody);
 		}
 
 		private void GetEndPointInfo() 
@@ -174,6 +160,20 @@ namespace Mono.CFoundry
 			return(HttpRequest(url, headers, "POST", body));
 		}
 
+		private JObject Put(string url, string body, WebHeaderCollection headers = null)
+		{
+			if ((DateTime.Now > _tokenExpiresAt) && (_refreshToken != null))
+				RefreshToken ();
+
+			if (headers == null)
+				headers = new WebHeaderCollection ();
+
+			if (_authToken != null)
+				headers.Add (HttpRequestHeader.Authorization, _authType + " " + _authToken);
+
+			return(HttpRequest(url, headers, "PUT", body));
+		}
+
 		private JObject HttpRequest(string url, WebHeaderCollection headers, string method, string body = null)
 		{
 
@@ -181,7 +181,7 @@ namespace Mono.CFoundry
 			request.Method = method;
 			request.Headers = headers;
 
-			if (method == "POST") {
+			if ((method == "POST") || (method == "PUT")) {
 
 				ASCIIEncoding encoding = new ASCIIEncoding ();
 				byte[] byte1 = encoding.GetBytes (body);

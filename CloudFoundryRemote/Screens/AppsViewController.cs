@@ -59,7 +59,7 @@ namespace CloudFoundryRemote
 						pleaseWait = VisualHelper.ShowPleaseWait("Wait...", View, () => {
 
 							AppDetailViewController appDetailViewController = 
-								new AppDetailViewController(_client, args.Item.App, _client.GetInstanceStats (args.Item.App.Guid));
+								new AppDetailViewController(_client, args.Item.App.Guid);
 
 							if (pleaseWait != null)
 								VisualHelper.HidePleaseWait(pleaseWait, View, () => {

@@ -6,6 +6,7 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using Mono.CFoundry.Models;
 using System.Drawing;
+using Mono.CFoundry;
 
 namespace CloudFoundryRemote.Helpers.Tables
 {
@@ -15,7 +16,19 @@ namespace CloudFoundryRemote.Helpers.Tables
 		Dictionary<string, Dictionary<string,string>> _tableItems;
 		string cellIdentifier = "TableCell";
 		string[] _sectionKeys;
+
 		UINavigationController _nav = null;
+
+		Dictionary<string, Type> _actionViewControllers = new Dictionary<string, Type>() {
+			{"Scale", typeof(ScaleAppViewController)}, 
+			{"View Logs", typeof(ScaleAppViewController)}, 
+			{"Browse Files", typeof(ScaleAppViewController)},
+			{"Stop / Start", typeof(ScaleAppViewController)},
+			{"Restart", typeof(ScaleAppViewController)}
+		};
+
+		public App App { get; set; }
+		public Client CFClient { get; set; }
 
 		public AppDetailsTableSource (Dictionary<string, Dictionary<string,string>> items, string[] sectionKeys, 
 		                              UINavigationController navigationController)
@@ -34,11 +47,6 @@ namespace CloudFoundryRemote.Helpers.Tables
 			string sectionKey = _sectionKeys [section];
 			return _tableItems [sectionKey].Count;
 		}
-
-//		public override string[] SectionIndexTitles (UITableView tableView)
-//		{
-//			return _sectionKeys;
-//		}
 
 		public override string TitleForHeader (UITableView tableView, int section)
 		{
@@ -96,6 +104,14 @@ namespace CloudFoundryRemote.Helpers.Tables
 				BrowserViewController bvc = new BrowserViewController (url);
 				if (_nav != null)
 					_nav.PushViewController (bvc, true);
+			}
+
+			if (sectionKey == "Actions") {
+				Type viewType = _actionViewControllers [rowKeyList [indexPath.Row]];
+				UIViewController targetController = (UIViewController)Activator.CreateInstance(viewType, new object[]{App, CFClient} );
+
+				if (_nav != null)
+					_nav.PushViewController (targetController, true);
 			}
 
 			tableView.DeselectRow (indexPath, true); // iOS convention is to remove the highlight

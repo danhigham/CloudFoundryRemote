@@ -12,17 +12,18 @@ namespace CloudFoundryRemote
 	public partial class AppDetailViewController : UIViewController
 	{
 		Mono.CFoundry.Client _client;
-		App _app;
-		List<InstanceStats> _stats;
+		private App _app;
+		private List<InstanceStats> _stats;
+		private string _guid;
+		UITableView _tblDetail;
 
-		public AppDetailViewController (Mono.CFoundry.Client client, App app, List<InstanceStats> stats) : base ("AppDetailViewController", null)
+		public AppDetailViewController (Mono.CFoundry.Client client, string guid) : base ("AppDetailViewController", null)
 		{
-
-			this.Title = app.Name;
-			_app = app;
-			_stats = stats;
-
 			_client = client;
+			_guid = guid;
+
+			_app = _client.GetApp (_guid);
+			_stats = _client.GetInstanceStats (_guid);
 		}
 
 		public override void DidReceiveMemoryWarning ()
@@ -37,16 +38,31 @@ namespace CloudFoundryRemote
 		{
 			base.ViewDidLoad ();
 
+			_tblDetail = new UITableView (new RectangleF (0, 40f, View.Frame.Width, View.Frame.Height + 20f), UITableViewStyle.Grouped);
 
-			UITableView tblDetail = new UITableView (new RectangleF (0, 40f, View.Frame.Width, View.Frame.Height + 20f), UITableViewStyle.Grouped);
-
-			UIImageView bgView = new UIImageView (tblDetail.Frame);
+			UIImageView bgView = new UIImageView (_tblDetail.Frame);
 			bgView.BackgroundColor = UIColor.FromPatternImage (new UIImage ("stripe_back.png"));
-			tblDetail.BackgroundView = bgView;
+			_tblDetail.BackgroundView = bgView;
 
-			Add (tblDetail);
+			Add (_tblDetail);
 
-			tblDetail.Source = appDataAsTableSource ();
+			SetTableSource ();
+		}
+
+		public void LoadData ()
+		{
+			_app = _client.GetApp (_guid);
+			_stats = _client.GetInstanceStats (_guid);
+
+			SetTableSource ();
+		}
+
+		private void SetTableSource ()
+		{
+			AppDetailsTableSource appDetailsSource = appDataAsTableSource ();
+			appDetailsSource.App = _app;
+			appDetailsSource.CFClient = _client;
+			_tblDetail.Source = appDetailsSource;
 		}
 
 		private AppDetailsTableSource appDataAsTableSource()
@@ -93,6 +109,7 @@ namespace CloudFoundryRemote
 			});
 
 			var actions = new Dictionary<string, string> ();
+
 			actions.Add ("Scale", "Scale the application");
 			actions.Add ("View Logs", "View the apps log files");
 			actions.Add ("Browse Files", "Browse the apps files");
