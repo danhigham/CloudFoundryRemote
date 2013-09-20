@@ -139,6 +139,11 @@
     <Compile Include="Screens\ScaleAppViewController.designer.cs">
       <DependentUpon>ScaleAppViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="Screens\BrowseFSViewController.cs" />
+    <Compile Include="Screens\BrowseFSViewController.designer.cs">
+      <DependentUpon>BrowseFSViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\FSEntryTableSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -149,6 +154,7 @@
     <InterfaceDefinition Include="Screens\AppDetailViewController.xib" />
     <InterfaceDefinition Include="Screens\BrowserViewController.xib" />
     <InterfaceDefinition Include="Screens\ScaleAppViewController.xib" />
+    <InterfaceDefinition Include="Screens\BrowseFSViewController.xib" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\logo-cloudfoundry.png" />

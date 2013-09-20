@@ -49,10 +49,10 @@ namespace CloudFoundryRemote
 			SetTableSource ();
 		}
 
-		public void LoadData ()
+		public void LoadData (App app, List<InstanceStats> stats)
 		{
-			_app = _client.GetApp (_guid);
-			_stats = _client.GetInstanceStats (_guid);
+			_app = app;
+			_stats = stats;
 
 			SetTableSource ();
 		}

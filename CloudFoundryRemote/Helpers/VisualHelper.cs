@@ -59,38 +59,22 @@ namespace CloudFoundryRemote.Helpers
 
 		public static UIView ShowPleaseWait(string message, UIView callingView, NSAction completeHandler) 
 		{
-			UIView pleaseWaitView = new UIView (new RectangleF (0, 0 - callingView.Frame.Height, callingView.Frame.Width, callingView.Frame.Height));
-			pleaseWaitView.BackgroundColor = new UIColor (0, 0, 0, 0);
 
-			UIImageView pleaseWait = new UIImageView (
-				new RectangleF ((callingView.Frame.Width / 2) - 67f, (callingView.Frame.Height / 2) - 45f, 125f, 90f));
+			UIView pleaseWaitView = new UIView (new RectangleF (0, 0, callingView.Frame.Width, callingView.Frame.Height));
+			pleaseWaitView.BackgroundColor = new UIColor (255f, 255f, 255f, 0f);
 
-			UITextView text = new UITextView (new RectangleF (0f, 10f, 125f, 60f));
-			text.BackgroundColor = new UIColor (0, 0, 0, 0);
-			text.TextAlignment = UITextAlignment.Center;
-			text.Text = message;
-			text.TextColor = UIColor.DarkGray;
-			text.Font = UIFont.BoldSystemFontOfSize (16f);
-
-			UIActivityIndicatorView spinner = new UIActivityIndicatorView (new RectangleF ((pleaseWait.Frame.Width / 2) - 15f, 50f, 30f, 30f));
+			UIActivityIndicatorView spinner = new UIActivityIndicatorView (new RectangleF ((pleaseWaitView.Frame.Width / 2) - 15f, (pleaseWaitView.Frame.Height / 2) - 15f, 30f, 30f));
 			spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
 			spinner.StartAnimating ();
 
-			pleaseWait.AddSubview (spinner);
-			pleaseWait.AddSubview (text);
+			pleaseWaitView.Add (spinner);
 
-			UIEdgeInsets insets = new UIEdgeInsets (18f, 18f, 18f, 18f);
-
-			UIImage pleaseWaitImage = new UIImage ("please-wait.png");
-			pleaseWaitImage = pleaseWaitImage.CreateResizableImage (insets);
-
-			pleaseWait.Image = pleaseWaitImage;
-			pleaseWaitView.AddSubview (pleaseWait);
+			UIColor destColor = new UIColor (255f, 255f, 255f, 0.8f);
 
 			callingView.AddSubview(pleaseWaitView);
 
 			UIView.Animate(0.2f, () => {
-				pleaseWaitView.Frame = callingView.Frame;
+				pleaseWaitView.BackgroundColor = destColor;
 			}, completeHandler);
 
 			return pleaseWaitView;
@@ -98,10 +82,10 @@ namespace CloudFoundryRemote.Helpers
 
 		public static void HidePleaseWait(UIView view, UIView callingView, NSAction completeHandler) 
 		{
-			RectangleF destination = new RectangleF (0, view.Frame.Height, view.Frame.Width, view.Frame.Height);
+			UIColor destColor = new UIColor (255f, 255f, 255f, 0f);
 
 			UIView.Animate(0.2f, () => {
-				view.Frame = destination;
+				view.BackgroundColor = destColor;
 			}, completeHandler);
 		}
 	}

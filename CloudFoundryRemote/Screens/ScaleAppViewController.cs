@@ -68,18 +68,19 @@ namespace CloudFoundryRemote
 					_client.Stop(_app.Guid);
 					_client.Start(_app.Guid);
 
+					var appDetailController = 
+						NavigationController.ViewControllers[NavigationController.ViewControllers.Length - 2] as AppDetailViewController;
+
+					if (appDetailController != null) 
+						appDetailController.LoadData(_client.GetApp (_app.Guid), _client.GetInstanceStats (_app.Guid));
+
 					if (pleaseWait != null)
 
 						VisualHelper.HidePleaseWait(pleaseWait, View, () => {
 
 							pleaseWait.RemoveFromSuperview ();
-
 							NavigationController.PopViewControllerAnimated(true);
 
-							var appDetailController = 
-								NavigationController.ViewControllers[NavigationController.ViewControllers.Length - 1] as AppDetailViewController;
-
-							if (appDetailController != null) appDetailController.LoadData();
 						});
 				});
 			};

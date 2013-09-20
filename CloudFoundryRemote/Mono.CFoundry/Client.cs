@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Mono.CFoundry.Models;
 
@@ -47,16 +48,34 @@ namespace Mono.CFoundry
 		public List<Organization> GetOrgs()
 		{
 			var orgs = new List<Organization> ();
-			var response = Get(_target + "/v2/organizations?inline-relations-depth=0");
+			var response = Get<JObject>(_target + "/v2/organizations?inline-relations-depth=0");
 			foreach (var o in response["resources"]) orgs.Add (Organization.FromJToken(o));
 
 			return orgs;
 		}
 
+		public string[] GetFolder(string appGuid, string path)
+		{
+			var response = Get<string> (_target + "/v2/apps/" + appGuid + "/instances/0/files" + path);
+
+			List<string> entries = new List<string> ();
+
+			foreach (Match match in Regex.Matches(response, @"([^\s]+)(.+)"))
+				entries.Add (match.Groups [1].ToString ());
+
+			return entries.ToArray();
+		}
+
+
+		public string GetFile(string appGuid, string path)
+		{
+			return Get<string> (_target + "/v2/apps/" + appGuid + "/instances/0/files" + path);
+		}
+
 		public List<Space> GetSpaces(string orgGuid)
 		{
 			var spaces = new List<Space> ();
-			var response = Get (_target + "/v2/organizations/" + orgGuid + "/spaces");
+			var response = Get<JObject> (_target + "/v2/organizations/" + orgGuid + "/spaces");
 			foreach (var s in response["resources"]) spaces.Add (Space.FromJToken (s));
 
 			return spaces;
@@ -65,7 +84,7 @@ namespace Mono.CFoundry
 		public List<App> GetApps (string spaceGuid)
 		{
 			var apps = new List<App> ();
-			var response = Get (_target + "/v2/spaces/" + spaceGuid + "/summary");
+			var response = Get<JObject> (_target + "/v2/spaces/" + spaceGuid + "/summary");
 			foreach (var a in response["apps"]) apps.Add (App.FromJToken (a));
 
 			return apps;
@@ -73,14 +92,14 @@ namespace Mono.CFoundry
 
 		public App GetApp (string guid)
 		{
-			var response = Get (_target + "/v2/apps/" + guid + "/summary");
+			var response = Get<JObject> (_target + "/v2/apps/" + guid + "/summary");
 			return App.FromJObject(response);
 		}
 
 		public List<InstanceStats> GetInstanceStats (string appGuid)
 		{
 			List<InstanceStats> instanceStats = new List<InstanceStats> ();
-			var response = Get (_target + "/v2/apps/" +appGuid + "/stats");
+			var response = Get<JObject> (_target + "/v2/apps/" +appGuid + "/stats");
 			foreach (var instance in response) instanceStats.Add (InstanceStats.FromJTokenHash (instance));
 
 			return instanceStats;
@@ -112,7 +131,7 @@ namespace Mono.CFoundry
 
 		private void GetEndPointInfo() 
 		{
-			var response = Get(_target + "/info");
+			var response = Get<JObject> (_target + "/info");
 			_uaaTarget = response["authorization_endpoint"].ToString();
 		}
 
@@ -123,7 +142,7 @@ namespace Mono.CFoundry
 
 			headers.Add(HttpRequestHeader.Authorization, "Basic Y2Y6");
 
-			var response = HttpRequest (loginURL, headers, "POST", "grant_type=refresh_token&refresh_token=" + _refreshToken);
+			var response = HttpRequest<JObject> (loginURL, headers, "POST", "grant_type=refresh_token&refresh_token=" + _refreshToken);
 			SetTokenFromResponse (response);
 		}
 
@@ -139,7 +158,7 @@ namespace Mono.CFoundry
 			Console.WriteLine ("Current token expires at " + _tokenExpiresAt);
 		}
 
-		private JObject Get(string url, WebHeaderCollection headers = null) 
+		private T Get<T>(string url, WebHeaderCollection headers = null) 
 		{
 			if ((DateTime.Now > _tokenExpiresAt) && (_refreshToken != null))
 				RefreshToken ();
@@ -149,7 +168,7 @@ namespace Mono.CFoundry
 			if (_authToken != null)
 				headers.Add (HttpRequestHeader.Authorization, _authType + " " + _authToken);
 
-			return(HttpRequest(url, headers, "GET"));
+			return(HttpRequest<T>(url, headers, "GET"));
 		}
 
 		private JObject Post(string url, WebHeaderCollection headers, string body)
@@ -157,7 +176,7 @@ namespace Mono.CFoundry
 			if ((DateTime.Now > _tokenExpiresAt) && (_refreshToken != null))
 				RefreshToken ();
 
-			return(HttpRequest(url, headers, "POST", body));
+			return(HttpRequest<JObject>(url, headers, "POST", body));
 		}
 
 		private JObject Put(string url, string body, WebHeaderCollection headers = null)
@@ -171,10 +190,10 @@ namespace Mono.CFoundry
 			if (_authToken != null)
 				headers.Add (HttpRequestHeader.Authorization, _authType + " " + _authToken);
 
-			return(HttpRequest(url, headers, "PUT", body));
+			return(HttpRequest<JObject>(url, headers, "PUT", body));
 		}
 
-		private JObject HttpRequest(string url, WebHeaderCollection headers, string method, string body = null)
+		private T HttpRequest<T>(string url, WebHeaderCollection headers, string method, string body = null)
 		{
 
 			WebRequest request = WebRequest.Create (url);
@@ -215,9 +234,11 @@ namespace Mono.CFoundry
 			readStream.Close();
 			response.Close(); 
 
-			var jObj = JObject.Parse (sb.ToString ());
-			Console.WriteLine (jObj);
-			return jObj;
+			if (typeof(T) == typeof(JObject)) {
+				return (T)(object)JObject.Parse (sb.ToString ());
+			} else {
+				return (T)(object)sb.ToString();
+			}
 		}
 	}
 }

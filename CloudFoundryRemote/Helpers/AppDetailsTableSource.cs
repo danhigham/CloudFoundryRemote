@@ -21,8 +21,8 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 		Dictionary<string, Type> _actionViewControllers = new Dictionary<string, Type>() {
 			{"Scale", typeof(ScaleAppViewController)}, 
-			{"View Logs", typeof(ScaleAppViewController)}, 
-			{"Browse Files", typeof(ScaleAppViewController)},
+			{"View Logs", typeof(BrowseFSViewController)}, 
+			{"Browse Files", typeof(BrowseFSViewController)},
 			{"Stop / Start", typeof(ScaleAppViewController)},
 			{"Restart", typeof(ScaleAppViewController)}
 		};
