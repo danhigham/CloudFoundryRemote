@@ -56,13 +56,13 @@ namespace CloudFoundryRemote
 
 						UIView pleaseWait = null;
 
-						pleaseWait = VisualHelper.ShowPleaseWait("Wait...", View, () => {
+						pleaseWait = VisualHelper.ShowPleaseWait("Loading...", View, () => {
 
 							AppDetailViewController appDetailViewController = 
 								new AppDetailViewController(_client, args.Item.App.Guid);
 
 							if (pleaseWait != null)
-								VisualHelper.HidePleaseWait(pleaseWait, View, () => {
+								VisualHelper.HidePleaseWait(pleaseWait, () => {
 									pleaseWait.RemoveFromSuperview ();
 									this.NavigationController.PushViewController(appDetailViewController, true);
 								});

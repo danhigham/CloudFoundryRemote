@@ -17,16 +17,22 @@ namespace Mono.CFoundry.Models
 
 		public static App FromJToken(JToken source) 
 		{
-			return new App () {
-				Guid = source["guid"].ToString(),
+			App app = new App () {
 				Name = source["name"].ToString(),
-				Urls = source["urls"].ToObject<string[]>(),
 				Memory = int.Parse(source["memory"].ToString()),
 				Instances = int.Parse(source["instances"].ToString()),
 				DiskQuota = int.Parse(source["disk_quota"].ToString()),
 				State = source["state"].ToString(),
 				DetectedBuildpack = source["detected_buildpack"].ToString()
 			};
+
+			if (source ["guid"] != null)
+				app.Guid = source ["guid"].ToString ();
+
+			if (source ["urls"] != null)
+				app.Urls = source ["urls"].ToObject<string[]> ();
+
+			return app;
 		}
 
 		public static App FromJObject(JObject source)

@@ -23,7 +23,13 @@ namespace CloudFoundryRemote
 			_guid = guid;
 
 			_app = _client.GetApp (_guid);
-			_stats = _client.GetInstanceStats (_guid);
+
+			if (_app.State.ToLower () == "started") 
+				_stats = _client.GetInstanceStats (_guid);
+			else
+				_stats = new List<InstanceStats> ();
+
+			Title = _app.Name;
 		}
 
 		public override void DidReceiveMemoryWarning ()
@@ -110,10 +116,9 @@ namespace CloudFoundryRemote
 
 			var actions = new Dictionary<string, string> ();
 
-			actions.Add ("Scale", "Scale the application");
-			actions.Add ("View Logs", "View the apps log files");
-			actions.Add ("Browse Files", "Browse the apps files");
-			actions.Add ("Stop / Start", "Start / Stop");
+			actions.Add ("Manage", "Manage the application");
+			if (_app.State.ToLower() == "started")
+				actions.Add ("Browse Files", "Browse the apps files");
 			actions.Add ("Restart", "Restart the app");
 
 			tableData.Add ("Actions", actions);

@@ -1,17 +1,17 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone.6.1" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CloudFoundryRemote/Screens/AppsViewController.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="CloudFoundryRemote/Helpers/AppDetailsTableSource.cs">
     <Files>
-      <File FileName="CloudFoundryRemote/Helpers/VisualHelper.cs" Line="1" Column="1" />
-      <File FileName="CloudFoundryRemote/Screens/HomeViewController.cs" Line="1" Column="1" />
-      <File FileName="CloudFoundryRemote/Screens/OrgsViewController.cs" Line="1" Column="1" />
-      <File FileName="CloudFoundryRemote/Screens/SpacesViewController.cs" Line="1" Column="1" />
-      <File FileName="CloudFoundryRemote/Screens/AppsViewController.cs" Line="70" Column="1" />
-      <File FileName="CloudFoundryRemote/Screens/AppDetailViewController.cs" Line="1" Column="1" />
+      <File FileName="CloudFoundryRemote/Screens/BrowseFSViewController.cs" Line="21" Column="52" />
+      <File FileName="CloudFoundryRemote/Screens/ScaleAppViewController.cs" Line="72" Column="25" />
+      <File FileName="CloudFoundryRemote/Screens/AppDetailViewController.cs" Line="1" Column="2" />
+      <File FileName="CloudFoundryRemote/Helpers/AppDetailsTableSource.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/danhigham/Projects/CloudFoundryRemote/CloudFoundryRemote/Helpers/AppDetailsTableSource.cs" line="106" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

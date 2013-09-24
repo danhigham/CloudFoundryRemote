@@ -52,10 +52,29 @@ namespace CloudFoundryRemote.Helpers.Tables
 			string uri2 = _tableItems[indexPath.Row].TrimStart('/');
 			string path = string.Format("{0}/{1}", uri1, uri2);
 
-			BrowseFSViewController fsBrowser = new BrowseFSViewController (_app, _client, path);
-			_nav.PushViewController (fsBrowser, true);
 
-			tableView.DeselectRow (indexPath, true); // iOS convention is to remove the highlight
+			UIView pleaseWait = null;
+			UIView lastView = _nav.ViewControllers [_nav.ViewControllers.Length - 1].View;
+
+			pleaseWait = VisualHelper.ShowPleaseWait ("Loading...", lastView, () => {
+
+				tableView.DeselectRow (indexPath, true); // iOS convention is to remove the highlight
+
+				BrowseFSViewController fsBrowser = new BrowseFSViewController (_app, _client, path);
+
+				VisualHelper.HidePleaseWait(pleaseWait, () => {
+
+					if (_nav != null)
+						_nav.PushViewController (fsBrowser, true);
+
+					pleaseWait.RemoveFromSuperview();
+
+				});
+
+			});
+
+
+
 		}
 
 	}

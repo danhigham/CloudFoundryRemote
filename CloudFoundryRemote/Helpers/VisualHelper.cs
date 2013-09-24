@@ -59,17 +59,24 @@ namespace CloudFoundryRemote.Helpers
 
 		public static UIView ShowPleaseWait(string message, UIView callingView, NSAction completeHandler) 
 		{
-
 			UIView pleaseWaitView = new UIView (new RectangleF (0, 0, callingView.Frame.Width, callingView.Frame.Height));
-			pleaseWaitView.BackgroundColor = new UIColor (255f, 255f, 255f, 0f);
+			pleaseWaitView.BackgroundColor = new UIColor (0f, 0f, 0f, 0f);
 
 			UIActivityIndicatorView spinner = new UIActivityIndicatorView (new RectangleF ((pleaseWaitView.Frame.Width / 2) - 15f, (pleaseWaitView.Frame.Height / 2) - 15f, 30f, 30f));
-			spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
+			spinner.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge;
 			spinner.StartAnimating ();
 
 			pleaseWaitView.Add (spinner);
 
-			UIColor destColor = new UIColor (255f, 255f, 255f, 0.8f);
+			UILabel messageLabel = new UILabel (new RectangleF (0f, spinner.Frame.Y + 50f, pleaseWaitView.Frame.Width, 30f));
+			messageLabel.TextColor = UIColor.White;
+			messageLabel.TextAlignment = UITextAlignment.Center;
+			messageLabel.Font = UIFont.SystemFontOfSize (20f);
+			messageLabel.Text = message;
+
+			pleaseWaitView.Add (messageLabel);
+
+			UIColor destColor = new UIColor (0f, 0f, 0f, 0.8f);
 
 			callingView.AddSubview(pleaseWaitView);
 
@@ -80,9 +87,9 @@ namespace CloudFoundryRemote.Helpers
 			return pleaseWaitView;
 		}
 
-		public static void HidePleaseWait(UIView view, UIView callingView, NSAction completeHandler) 
+		public static void HidePleaseWait(UIView view, NSAction completeHandler) 
 		{
-			UIColor destColor = new UIColor (255f, 255f, 255f, 0f);
+			UIColor destColor = new UIColor (0f, 0f, 0f, 0f);
 
 			UIView.Animate(0.2f, () => {
 				view.BackgroundColor = destColor;

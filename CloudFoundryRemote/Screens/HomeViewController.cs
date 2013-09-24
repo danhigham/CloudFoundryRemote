@@ -69,7 +69,7 @@ namespace CloudFoundryRemote
 
 					if (pleaseWait != null)
 
-						VisualHelper.HidePleaseWait(pleaseWait, View, () => {
+						VisualHelper.HidePleaseWait(pleaseWait, () => {
 							pleaseWait.RemoveFromSuperview ();
 							this.NavigationController.PushViewController(orgsViewController, true);
 						});

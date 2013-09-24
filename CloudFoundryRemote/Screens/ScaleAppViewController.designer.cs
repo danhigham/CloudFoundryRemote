@@ -22,16 +22,21 @@ namespace CloudFoundryRemote
 		MonoTouch.UIKit.UISlider instanceSlider { get; set; }
 
 		[Outlet]
-		MonoTouch.UIKit.UILabel lblName { get; set; }
-
-		[Outlet]
 		MonoTouch.UIKit.UILabel memoryOutput { get; set; }
 
 		[Outlet]
 		MonoTouch.UIKit.UISlider memorySlider { get; set; }
+
+		[Outlet]
+		MonoTouch.UIKit.UISwitch startSwitch { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (btnApply != null) {
+				btnApply.Dispose ();
+				btnApply = null;
+			}
+
 			if (instanceOutput != null) {
 				instanceOutput.Dispose ();
 				instanceOutput = null;
@@ -40,11 +45,6 @@ namespace CloudFoundryRemote
 			if (instanceSlider != null) {
 				instanceSlider.Dispose ();
 				instanceSlider = null;
-			}
-
-			if (lblName != null) {
-				lblName.Dispose ();
-				lblName = null;
 			}
 
 			if (memoryOutput != null) {
@@ -57,9 +57,9 @@ namespace CloudFoundryRemote
 				memorySlider = null;
 			}
 
-			if (btnApply != null) {
-				btnApply.Dispose ();
-				btnApply = null;
+			if (startSwitch != null) {
+				startSwitch.Dispose ();
+				startSwitch = null;
 			}
 		}
 	}

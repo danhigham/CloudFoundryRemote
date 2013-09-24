@@ -5,6 +5,7 @@ using MonoTouch.UIKit;
 using Mono.CFoundry.Models;
 using Mono.CFoundry;
 using CloudFoundryRemote.Helpers;
+using System.Collections.Generic;
 
 namespace CloudFoundryRemote
 {
@@ -17,7 +18,7 @@ namespace CloudFoundryRemote
 		{
 			_app = app;
 			_client = client;
-			Title = "Scale";
+			Title = _app.Name;
 		}
 
 		public override void DidReceiveMemoryWarning ()
@@ -33,7 +34,6 @@ namespace CloudFoundryRemote
 			base.ViewDidLoad ();
 
 			// Init sliders
-
 			float instanceStep = 1f;
 			float memoryStep = 64f;
 
@@ -49,6 +49,8 @@ namespace CloudFoundryRemote
 				memoryOutput.Text = memorySlider.Value.ToString() + "M";
 			};
 
+			startSwitch.On = (_app.State.ToLower () == "started");
+
 			// Set values for current application
 			memorySlider.Value = _app.Memory;
 			instanceSlider.Value = _app.Instances;
@@ -56,29 +58,59 @@ namespace CloudFoundryRemote
 			instanceOutput.Text = instanceSlider.Value.ToString();
 			memoryOutput.Text = memorySlider.Value.ToString() + "M";
 
-			lblName.Text = _app.Name;
-
 			UIView pleaseWait = null;
 
-			btnApply.TouchUpInside += (object sender, EventArgs e) => {
-			
-				pleaseWait = VisualHelper.ShowPleaseWait("Wait...", View, () => {
 
-					_client.Scale(_app.Guid, (int)memorySlider.Value, (int)instanceSlider.Value);
-					_client.Stop(_app.Guid);
-					_client.Start(_app.Guid);
+
+			btnApply.TouchUpInside += (object sender, EventArgs e) => {
+
+				int memSliderValue = (int)memorySlider.Value;
+				int instanceSliderValue = (int)instanceSlider.Value;
+
+				bool scale = false;
+				bool restart = false;
+				bool stop = false;
+
+				if ((memSliderValue != _app.Memory) || (instanceSliderValue != _app.Instances)) scale = true;
+				if (((memSliderValue != _app.Memory) || (instanceSliderValue != _app.Instances)) && startSwitch.On) restart = true;
+				if (!startSwitch.On) stop = true;
+				if ((startSwitch.On) && (_app.State.ToLower() == "stopped")) restart = true;
+
+				if (!scale && !restart && !stop) {
+					NavigationController.PopViewControllerAnimated(true);
+					return;
+				}
+
+				pleaseWait = VisualHelper.ShowPleaseWait("Loading...", View, () => {
+
+					if (scale == true) _client.Scale(_app.Guid, (int)memorySlider.Value, (int)instanceSlider.Value);
+					if (stop || restart) {
+						App app = App.FromJToken(_client.Stop(_app.Guid)["entity"]);
+						_app.State = app.State;
+					}
+					if (restart) {
+						App app = App.FromJToken(_client.Start(_app.Guid)["entity"]);
+						_app.State = app.State;
+					}
 
 					var appDetailController = 
 						NavigationController.ViewControllers[NavigationController.ViewControllers.Length - 2] as AppDetailViewController;
 
-					if (appDetailController != null) 
-						appDetailController.LoadData(_client.GetApp (_app.Guid), _client.GetInstanceStats (_app.Guid));
+					if (appDetailController != null) {
+
+						List<InstanceStats> stats = new List<InstanceStats>();
+
+						if (_app.State.ToLower () == "started") stats = _client.GetInstanceStats (_app.Guid);
+
+						appDetailController.LoadData(_client.GetApp (_app.Guid), stats);
+					}
 
 					if (pleaseWait != null)
 
-						VisualHelper.HidePleaseWait(pleaseWait, View, () => {
+						VisualHelper.HidePleaseWait(pleaseWait, () => {
 
 							pleaseWait.RemoveFromSuperview ();
+
 							NavigationController.PopViewControllerAnimated(true);
 
 						});
