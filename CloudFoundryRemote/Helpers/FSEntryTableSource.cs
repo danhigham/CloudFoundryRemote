@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -19,7 +20,7 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 		public FSEntryTableSource (string[] items, UINavigationController nav, Client client, App app, string parentPath)
 		{
-			_tableItems = items;
+			_tableItems = items.OrderBy (i => i).ToArray ();
 			_app = app;
 			_client = client;
 			_nav = nav;

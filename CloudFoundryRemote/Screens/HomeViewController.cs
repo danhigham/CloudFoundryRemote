@@ -6,6 +6,7 @@ using MonoTouch.UIKit;
 using CloudFoundryRemote.Helpers;
 using Mono.CFoundry.Models;
 using CloudFoundryRemote.Helpers.Tables;
+using CloudFoundryRemote.Data.Models;
 
 namespace CloudFoundryRemote
 {
@@ -35,7 +36,13 @@ namespace CloudFoundryRemote
 			VisualHelper.SetTextFieldPadding (txtPassword);
 			VisualHelper.SetTextFieldPadding (txtTarget);
 
-//			VisualHelper.SetGreyButton (btnLogin);
+			if (Connection.Count () == 0) {
+				btnSavedConnections.Hidden = true;
+				btnSavedConnections.Enabled = false;
+			} else {
+				btnSavedConnections.Hidden = false;
+				btnSavedConnections.Enabled = true;
+			}
 
 			txtTarget.Text = "api.run.pivotal.io";
 			txtUsername.BecomeFirstResponder ();
@@ -61,9 +68,10 @@ namespace CloudFoundryRemote
 
 				pleaseWait = VisualHelper.ShowPleaseWait("Connecting...", View, () => {
 
-					var client = new Mono.CFoundry.Client ();
-					//client.Login (txtUsername.Text, txtPassword.Text);
-					client.Login("dhigham@gopivotal.com", "knife party bonfire");
+					if (saveConnectionSwitch.On) Connection.CreateOrUpdateConnection(txtTarget.Text, txtUsername.Text, txtPassword.Text, trustCertsSwitch.On);
+
+					var client = new Mono.CFoundry.Client(txtTarget.Text, trustCertsSwitch.On);
+					client.Login (txtUsername.Text, txtPassword.Text);
 
 					OrgsViewController orgsViewController = new OrgsViewController(client, client.GetOrgs());
 
@@ -75,9 +83,42 @@ namespace CloudFoundryRemote
 						});
 
 				});
-
-
 			};
+
+			btnSavedConnections.TouchUpInside += (object sender, EventArgs e) => {
+				VisualHelper.ShowConnectionPicker(View, (Connection connection) => {
+					txtTarget.Text = connection.Endpoint;
+					txtUsername.Text = connection.Username;
+					txtPassword.Text = connection.Password;
+					trustCertsSwitch.On = connection.TrustAll;
+					return connection;
+				});
+			};
+
+			SetForm ();
+		}
+
+		private void SetForm() {
+
+			string target = "";
+			string username = "";
+			string password = "";
+			bool trustCert = false;
+
+			if (Connection.Count () > 0) {
+
+				var connection = Connection.First ();
+
+				target = connection.Endpoint;
+				username = connection.Username;
+				password = connection.Password;
+				trustCert = connection.TrustAll;
+			}
+
+			txtTarget.Text = target;
+			txtUsername.Text = username;
+			txtPassword.Text = password;
+			trustCertsSwitch.On = trustCert;
 		}
 	}
 }

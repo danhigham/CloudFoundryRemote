@@ -8,6 +8,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Mono.CFoundry.Models;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 namespace Mono.CFoundry
 {
@@ -18,6 +20,7 @@ namespace Mono.CFoundry
 		string _authToken = null;
 		string _authType = null;
 		string _refreshToken = null;
+		bool _trustAll = false;
 		DateTime _tokenExpiresAt = DateTime.Now;
 
 		public Client ()
@@ -26,9 +29,10 @@ namespace Mono.CFoundry
 			GetEndPointInfo ();
 		}
 
-		public Client (string target)
+		public Client (string target, bool trustAll = false)
 		{
 			_target = "https://" + target;
+			_trustAll = trustAll;
 			GetEndPointInfo ();
 		}
 
@@ -200,6 +204,8 @@ namespace Mono.CFoundry
 			request.Method = method;
 			request.Headers = headers;
 
+			ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
+
 			if ((method == "POST") || (method == "PUT")) {
 
 				ASCIIEncoding encoding = new ASCIIEncoding ();
@@ -239,6 +245,21 @@ namespace Mono.CFoundry
 			} else {
 				return (T)(object)sb.ToString();
 			}
+		}
+
+		private bool ValidateServerCertificate(
+			object sender,
+			X509Certificate certificate,
+			X509Chain chain,
+			SslPolicyErrors sslPolicyErrors)
+		{
+			if (sslPolicyErrors == SslPolicyErrors.None)
+				return true;
+
+			Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+
+			// Do not allow this client to communicate with unauthenticated servers. 
+			return _trustAll;
 		}
 	}
 }

@@ -19,12 +19,6 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 		UINavigationController _nav = null;
 
-		Dictionary<string, Type> _actionViewControllers = new Dictionary<string, Type>() {
-			{"Manage", typeof(ScaleAppViewController)}, 
-			{"Browse Files", typeof(BrowseFSViewController)},
-			{"Restart", typeof(ScaleAppViewController)}
-		};
-
 		public App App { get; set; }
 		public Client CFClient { get; set; }
 

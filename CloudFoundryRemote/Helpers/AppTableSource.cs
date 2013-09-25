@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -27,7 +28,7 @@ namespace CloudFoundryRemote.Helpers.Tables
 
 		public AppTableSource (AppTableSourceItem[] items)
 		{
-			_tableItems = items;
+			_tableItems = items.OrderBy (i => i.Caption).ToArray ();
 		}
 
 		public override int RowsInSection (UITableView tableview, int section)

@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
+using CloudFoundryRemote.Data.Models;
 
 namespace CloudFoundryRemote.Helpers
 {
@@ -94,6 +95,40 @@ namespace CloudFoundryRemote.Helpers
 			UIView.Animate(0.2f, () => {
 				view.BackgroundColor = destColor;
 			}, completeHandler);
+		}
+
+		public static void ShowConnectionPicker(UIView callingView, Func<Connection, Connection> handler)
+		{
+			UIView connectionsView = new UIView (new RectangleF (0, 0, callingView.Frame.Width, callingView.Frame.Height));
+			connectionsView.BackgroundColor = new UIColor (0f, 0f, 0f, 0.8f);
+
+			UIView pickerContainer = new UIView (new RectangleF (10f, (callingView.Frame.Height / 2) - 100f, callingView.Frame.Width - 20f, 200f));
+			pickerContainer.BackgroundColor = new UIColor (255f, 255f, 255f, 1f);
+			pickerContainer.Layer.CornerRadius = 5f;
+
+			UIPickerView picker = new UIPickerView (new RectangleF (0f, 0f, pickerContainer.Frame.Width, pickerContainer.Frame.Height - 50f));
+			
+			picker.Model = Connection.ConnectionsForPicker ();
+
+			UIButton okButton = UIButton.FromType(UIButtonType.System);
+			okButton.Frame = new RectangleF (0f, pickerContainer.Frame.Height - 50f, pickerContainer.Frame.Width, 50f);
+
+			okButton.SetTitle("Select", UIControlState.Normal);
+
+			okButton.TouchUpInside += (object sender, EventArgs e) => {
+				connectionsView.RemoveFromSuperview();
+				int index = picker.SelectedRowInComponent(0);
+
+				var viewModel = picker.Model as ConnectionPickerViewModel;
+
+				if (viewModel != null)
+					handler(viewModel.getModel(index));
+			};
+
+			pickerContainer.Add (okButton);
+			pickerContainer.Add (picker);
+			connectionsView.Add (pickerContainer);
+			callingView.Add (connectionsView);
 		}
 	}
 }

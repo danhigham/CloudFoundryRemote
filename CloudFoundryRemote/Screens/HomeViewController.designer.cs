@@ -16,6 +16,15 @@ namespace CloudFoundryRemote
 		MonoTouch.UIKit.UIButton btnLogin { get; set; }
 
 		[Outlet]
+		MonoTouch.UIKit.UIButton btnSavedConnections { get; set; }
+
+		[Outlet]
+		MonoTouch.UIKit.UISwitch saveConnectionSwitch { get; set; }
+
+		[Outlet]
+		MonoTouch.UIKit.UISwitch trustCertsSwitch { get; set; }
+
+		[Outlet]
 		MonoTouch.UIKit.UITextField txtPassword { get; set; }
 
 		[Outlet]
@@ -26,6 +35,26 @@ namespace CloudFoundryRemote
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (btnLogin != null) {
+				btnLogin.Dispose ();
+				btnLogin = null;
+			}
+
+			if (btnSavedConnections != null) {
+				btnSavedConnections.Dispose ();
+				btnSavedConnections = null;
+			}
+
+			if (saveConnectionSwitch != null) {
+				saveConnectionSwitch.Dispose ();
+				saveConnectionSwitch = null;
+			}
+
+			if (trustCertsSwitch != null) {
+				trustCertsSwitch.Dispose ();
+				trustCertsSwitch = null;
+			}
+
 			if (txtPassword != null) {
 				txtPassword.Dispose ();
 				txtPassword = null;
@@ -39,11 +68,6 @@ namespace CloudFoundryRemote
 			if (txtUsername != null) {
 				txtUsername.Dispose ();
 				txtUsername = null;
-			}
-
-			if (btnLogin != null) {
-				btnLogin.Dispose ();
-				btnLogin = null;
 			}
 		}
 	}

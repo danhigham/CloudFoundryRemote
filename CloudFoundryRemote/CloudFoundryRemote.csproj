@@ -73,9 +73,12 @@
     <OutputPath>bin\iPhone\AppStore</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Distribution</CodesignKey>
+    <CodesignKey>iPhone Distribution: Tactusworks Ltd (37X36JU5SM)</CodesignKey>
     <ConsolePause>false</ConsolePause>
-    <CodesignProvision>Automatic:AppStore</CodesignProvision>
+    <CodesignProvision>7EAF012A-007D-4523-A72E-4CA36E8DF2F4</CodesignProvision>
+    <IpaPackageName />
+    <MtouchI18n />
+    <MtouchArch>ARMv7</MtouchArch>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -85,7 +88,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\Downloads\json.net-4.5.11\lib\ios\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\json.net-4.5.11\lib\ios\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +98,8 @@
     <Folder Include="Mono.CFoundry\Models\" />
     <Folder Include="Images\" />
     <Folder Include="Helpers\" />
+    <Folder Include="Data\" />
+    <Folder Include="Data\Models\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -144,6 +149,11 @@
       <DependentUpon>BrowseFSViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\FSEntryTableSource.cs" />
+    <Compile Include="Data\SQLite.cs" />
+    <Compile Include="Data\SQLiteAsync.cs" />
+    <Compile Include="Helpers\DataHelper.cs" />
+    <Compile Include="Data\Models\Connection.cs" />
+    <Compile Include="Data\Models\ConnectionPickerViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -175,5 +185,8 @@
     <BundleResource Include="Resources\Icon%402x.png" />
     <BundleResource Include="Resources\Icon.png" />
     <BundleResource Include="Resources\please-wait.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\connections.db" />
   </ItemGroup>
 </Project>
