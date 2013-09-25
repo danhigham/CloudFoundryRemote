@@ -71,7 +71,18 @@ namespace CloudFoundryRemote
 					if (saveConnectionSwitch.On) Connection.CreateOrUpdateConnection(txtTarget.Text, txtUsername.Text, txtPassword.Text, trustCertsSwitch.On);
 
 					var client = new Mono.CFoundry.Client(txtTarget.Text, trustCertsSwitch.On);
-					client.Login (txtUsername.Text, txtPassword.Text);
+
+					client.OnHttpError += (object sender2, Mono.CFoundry.HttpErrorEventArgs httpError) => {
+						new UIAlertView ("ERROR!", httpError.Message, null, "OK", null).Show();
+						Console.WriteLine(httpError);
+					};
+
+					var success = client.Login (txtUsername.Text, txtPassword.Text);
+
+					if (!success) {
+						pleaseWait.RemoveFromSuperview ();
+						return;
+					}
 
 					OrgsViewController orgsViewController = new OrgsViewController(client, client.GetOrgs());
 

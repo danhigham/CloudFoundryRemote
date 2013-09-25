@@ -129,8 +129,8 @@ namespace CloudFoundryRemote.Helpers.Tables
 								
 							});
 						}
-						Console.WriteLine(e.ButtonIndex);
 					};
+
 					alert.Show ();
 					return;
 				}

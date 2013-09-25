@@ -13,6 +13,16 @@ using System.Net.Security;
 
 namespace Mono.CFoundry
 {
+	public class HttpErrorEventArgs : EventArgs
+	{
+		public string Message { get; private set; }
+
+		public HttpErrorEventArgs(string message)
+		{
+			Message = message;
+		}
+	}
+
 	public class Client
 	{
 		string _target;
@@ -22,6 +32,9 @@ namespace Mono.CFoundry
 		string _refreshToken = null;
 		bool _trustAll = false;
 		DateTime _tokenExpiresAt = DateTime.Now;
+
+		public delegate void HttpErrorHandler(object sender, HttpErrorEventArgs e);
+		public event HttpErrorHandler OnHttpError;
 
 		public Client ()
 		{
@@ -38,7 +51,7 @@ namespace Mono.CFoundry
 
 		public string AuthToken { get { return _authToken; } }
 
-		public void Login(string username, string password)
+		public bool Login(string username, string password)
 		{
 			string loginURL = _uaaTarget + "/oauth/token";
 			WebHeaderCollection headers = new WebHeaderCollection ();
@@ -46,7 +59,13 @@ namespace Mono.CFoundry
 			headers.Add(HttpRequestHeader.Authorization, "Basic Y2Y6");
 
 			var response = Post (loginURL, headers, "grant_type=password&username=" + username + "&password=" + password);
+
+			if (response ["error"] != null)
+				return false;
+
 			SetTokenFromResponse (response);
+
+			return true;
 		}
 
 		public List<Organization> GetOrgs()
@@ -221,7 +240,22 @@ namespace Mono.CFoundry
 			}
 
 			Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+			HttpWebResponse response = null;
+			try {
+				response = (HttpWebResponse)request.GetResponse();
+			}
+			catch (System.Net.WebException e) {
+				HttpErrorEventArgs args = new HttpErrorEventArgs (e.Message);
+				if (OnHttpError != null)
+					OnHttpError (this, args);
+
+				if (typeof(T) == typeof(JObject)) {
+					return (T)(object)JObject.Parse ("{error: \"" + e.Message + "\"}");
+				} else {
+					return (T)(object)e.Message;
+				}
+			}
 
 			// Pipe the stream to a higher level stream reader with the required encoding format. 
 			StreamReader readStream = new StreamReader( response.GetResponseStream(), encode );
