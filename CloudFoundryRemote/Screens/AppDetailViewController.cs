@@ -6,10 +6,12 @@ using MonoTouch.UIKit;
 using System.Collections.Generic;
 using Mono.CFoundry.Models;
 using CloudFoundryRemote.Helpers.Tables;
+using CloudFoundryRemote.Helpers;
+using System.Threading;
 
 namespace CloudFoundryRemote
 {
-	public partial class AppDetailViewController : UIViewController
+	public partial class AppDetailViewController : UITableViewController
 	{
 		Mono.CFoundry.Client _client;
 		private App _app;
@@ -44,13 +46,36 @@ namespace CloudFoundryRemote
 		{
 			base.ViewDidLoad ();
 
+			NavigationItem.RightBarButtonItem = VisualHelper.NewLogoutButton (NavigationController);
+
 			_tblDetail = new UITableView (new RectangleF (0, 40f, View.Frame.Width, View.Frame.Height + 20f), UITableViewStyle.Grouped);
 
-			UIImageView bgView = new UIImageView (_tblDetail.Frame);
-			bgView.BackgroundColor = UIColor.FromPatternImage (new UIImage ("stripe_back.png"));
-			_tblDetail.BackgroundView = bgView;
+			NavigationController.View.BackgroundColor = UIColor.FromPatternImage (new UIImage ("stripe_back.png"));
+			TableView.BackgroundColor = UIColor.Clear;
 
-			Add (_tblDetail);
+			TableView = _tblDetail;
+
+			RefreshControl = new UIRefreshControl();
+			RefreshControl.TintColor = UIColor.DarkGray;
+
+			RefreshControl.ValueChanged += (object sender, EventArgs e) => {
+
+				Thread thread = new Thread( new ThreadStart(() => {
+
+					InvokeOnMainThread (() => { 
+					
+						_app = _client.GetApp(_guid);
+						_stats = _client.GetInstanceStats (_guid);
+
+						SetTableSource();	
+
+						RefreshControl.EndRefreshing (); 
+					});
+						
+				}));
+
+				thread.Start();			
+			};
 
 			SetTableSource ();
 		}

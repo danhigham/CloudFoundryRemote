@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using CloudFoundryRemote.Helpers;
 
 namespace CloudFoundryRemote
 {
@@ -25,7 +26,9 @@ namespace CloudFoundryRemote
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			
+
+			NavigationItem.RightBarButtonItem = VisualHelper.NewLogoutButton (NavigationController);
+
 			// Perform any additional setup after loading the view, typically from a nib.
 			UIWebView webView = new UIWebView (new RectangleF (0f, 0f, View.Frame.Width, View.Frame.Height));
 			View.Add (webView);

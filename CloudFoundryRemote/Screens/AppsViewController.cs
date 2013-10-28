@@ -18,7 +18,6 @@ namespace CloudFoundryRemote
 		{
 			this.Title = "Applications";
 
-
 			_client = client;
 			_tblSource = AppsAsTableView(apps);
 		}
@@ -34,6 +33,8 @@ namespace CloudFoundryRemote
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+
+			NavigationItem.RightBarButtonItem = VisualHelper.NewLogoutButton (NavigationController);
 
 			UITableView tblApps = new UITableView (new RectangleF (0, 0, View.Frame.Width, View.Frame.Height), UITableViewStyle.Plain);
 			Add (tblApps);

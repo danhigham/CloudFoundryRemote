@@ -39,6 +39,8 @@ namespace CloudFoundryRemote
 
 			tblOrgs.Source = _tblSource;
 			// Perform any additional setup after loading the view, typically from a nib.
+
+			NavigationItem.RightBarButtonItem = VisualHelper.NewLogoutButton (NavigationController);
 		}
 
 

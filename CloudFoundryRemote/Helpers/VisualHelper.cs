@@ -130,6 +130,19 @@ namespace CloudFoundryRemote.Helpers
 			connectionsView.Add (pickerContainer);
 			callingView.Add (connectionsView);
 		}
+
+		public static UIBarButtonItem NewLogoutButton(UINavigationController navigationController)
+		{
+			return new UIBarButtonItem ("Logout", UIBarButtonItemStyle.Plain, (sender, e) => {
+				navigationController.PopToRootViewController(true);
+
+				HomeViewController home = navigationController.ViewControllers[0] as HomeViewController;
+
+				if (home != null) {
+					home.LogoutAndClearForm();
+				}
+			});
+		}
 	}
 }
 

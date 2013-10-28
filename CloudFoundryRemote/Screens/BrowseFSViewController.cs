@@ -44,6 +44,8 @@ namespace CloudFoundryRemote
 		{
 			base.ViewDidLoad ();
 
+			NavigationItem.RightBarButtonItem = VisualHelper.NewLogoutButton (NavigationController);
+
 			if ((_path.EndsWith ("/")) || (_path.Length == 0)) {
 
 				UITableView tblFiles = new UITableView (new RectangleF (0f, 0f, View.Frame.Width, View.Frame.Height), UITableViewStyle.Plain);

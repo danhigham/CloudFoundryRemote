@@ -12,6 +12,7 @@ namespace CloudFoundryRemote
 {
 	public partial class HomeViewController : UIViewController
 	{
+		Mono.CFoundry.Client _client;
 
 		public HomeViewController () : base ("HomeViewController", null)
 		{
@@ -44,9 +45,6 @@ namespace CloudFoundryRemote
 				btnSavedConnections.Enabled = true;
 			}
 
-			txtTarget.Text = "api.run.pivotal.io";
-			txtUsername.BecomeFirstResponder ();
-
 			txtTarget.ShouldReturn += (textField) => { 
 				txtUsername.BecomeFirstResponder();
 				return false; 
@@ -70,21 +68,27 @@ namespace CloudFoundryRemote
 
 					if (saveConnectionSwitch.On) Connection.CreateOrUpdateConnection(txtTarget.Text, txtUsername.Text, txtPassword.Text, trustCertsSwitch.On);
 
-					var client = new Mono.CFoundry.Client(txtTarget.Text, trustCertsSwitch.On);
-
-					client.OnHttpError += (object sender2, Mono.CFoundry.HttpErrorEventArgs httpError) => {
+					_client = new Mono.CFoundry.Client(txtTarget.Text, trustCertsSwitch.On, 
+					   	(sender2, httpError) => {
 						new UIAlertView ("ERROR!", httpError.Message, null, "OK", null).Show();
 						Console.WriteLine(httpError);
-					};
+					});
 
-					var success = client.Login (txtUsername.Text, txtPassword.Text);
+					var success = _client.GetEndPointInfo();
 
 					if (!success) {
 						pleaseWait.RemoveFromSuperview ();
 						return;
 					}
 
-					OrgsViewController orgsViewController = new OrgsViewController(client, client.GetOrgs());
+					success = _client.Login (txtUsername.Text, txtPassword.Text);
+
+					if (!success) {
+						pleaseWait.RemoveFromSuperview ();
+						return;
+					}
+
+					OrgsViewController orgsViewController = new OrgsViewController(_client, _client.GetOrgs());
 
 					if (pleaseWait != null)
 
@@ -106,25 +110,28 @@ namespace CloudFoundryRemote
 				});
 			};
 
-			SetForm ();
+			LogoutAndClearForm ();
 		}
 
-		private void SetForm() {
+		public void LogoutAndClearForm() {
+
+			if (_client != null)
+				_client.Logout ();
 
 			string target = "";
 			string username = "";
 			string password = "";
 			bool trustCert = false;
 
-			if (Connection.Count () > 0) {
-
-				var connection = Connection.First ();
-
-				target = connection.Endpoint;
-				username = connection.Username;
-				password = connection.Password;
-				trustCert = connection.TrustAll;
-			}
+//			if (Connection.Count () > 0) {
+//
+//				var connection = Connection.First ();
+//
+//				target = connection.Endpoint;
+//				username = connection.Username;
+//				password = connection.Password;
+//				trustCert = connection.TrustAll;
+//			}
 
 			txtTarget.Text = target;
 			txtUsername.Text = username;

@@ -44,6 +44,10 @@ namespace CloudFoundryRemote.Data.Models
 			textView.TextAlignment = UITextAlignment.Center;
 			textView.Text = text;
 
+//			int index = picker.SelectedRowInComponent(0);
+//			if (index == row)
+//				textView.Font = UIFont.BoldSystemFontOfSize (14f);
+
 			UIView wrapper = new UIView (frame);
 			wrapper.Add (textView);
 

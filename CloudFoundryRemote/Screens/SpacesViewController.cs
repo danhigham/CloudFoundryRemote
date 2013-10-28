@@ -41,6 +41,7 @@ namespace CloudFoundryRemote
 
 			tblSpaces.Source = _tblSource;
 
+			NavigationItem.RightBarButtonItem = VisualHelper.NewLogoutButton (NavigationController);
 		}
 
 		private UITableViewSource SpacesAsTableView(List<Space> spaces)

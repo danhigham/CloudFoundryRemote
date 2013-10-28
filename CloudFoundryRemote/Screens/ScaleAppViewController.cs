@@ -33,6 +33,8 @@ namespace CloudFoundryRemote
 		{
 			base.ViewDidLoad ();
 
+			NavigationItem.RightBarButtonItem = VisualHelper.NewLogoutButton (NavigationController);
+
 			// Init sliders
 			float instanceStep = 1f;
 			float memoryStep = 64f;
@@ -60,8 +62,6 @@ namespace CloudFoundryRemote
 
 			UIView pleaseWait = null;
 
-
-
 			btnApply.TouchUpInside += (object sender, EventArgs e) => {
 
 				int memSliderValue = (int)memorySlider.Value;
@@ -81,43 +81,51 @@ namespace CloudFoundryRemote
 					return;
 				}
 
-				pleaseWait = VisualHelper.ShowPleaseWait("Loading...", View, () => {
+				var alert = new UIAlertView ("Apply", "Apply changes?", null, "Cancel", new string[] { "OK" });
 
-					if (scale == true) _client.Scale(_app.Guid, (int)memorySlider.Value, (int)instanceSlider.Value);
-					if (stop || restart) {
-						App app = App.FromJToken(_client.Stop(_app.Guid)["entity"]);
-						_app.State = app.State;
-					}
-					if (restart) {
-						App app = App.FromJToken(_client.Start(_app.Guid)["entity"]);
-						_app.State = app.State;
-					}
+				alert.Clicked += (object sender2, UIButtonEventArgs e2) => {
+					if (e2.ButtonIndex > 0) {
 
-					var appDetailController = 
-						NavigationController.ViewControllers[NavigationController.ViewControllers.Length - 2] as AppDetailViewController;
+						pleaseWait = VisualHelper.ShowPleaseWait("Scaling...", View, () => {
 
-					if (appDetailController != null) {
+							if (scale == true) _client.Scale(_app.Guid, (int)memorySlider.Value, (int)instanceSlider.Value);
 
-						List<InstanceStats> stats = new List<InstanceStats>();
+							if (stop || restart) {
+								App app = App.FromJToken(_client.Stop(_app.Guid)["entity"]);
+								_app.State = app.State;
+							}
+							if (restart) {
+								App app = App.FromJToken(_client.Start(_app.Guid)["entity"]);
+								_app.State = app.State;
+							}
 
-						if (_app.State.ToLower () == "started") stats = _client.GetInstanceStats (_app.Guid);
+							var appDetailController = 
+								NavigationController.ViewControllers[NavigationController.ViewControllers.Length - 2] as AppDetailViewController;
 
-						appDetailController.LoadData(_client.GetApp (_app.Guid), stats);
-					}
+							if (appDetailController != null) {
+								List<InstanceStats> stats = new List<InstanceStats>();
+								if (_app.State.ToLower () == "started") stats = _client.GetInstanceStats (_app.Guid);
+								appDetailController.LoadData(_client.GetApp (_app.Guid), stats);
+							}
 
-					if (pleaseWait != null)
-
-						VisualHelper.HidePleaseWait(pleaseWait, () => {
-
-							pleaseWait.RemoveFromSuperview ();
-
-							NavigationController.PopViewControllerAnimated(true);
+							if (pleaseWait != null) {
+								VisualHelper.HidePleaseWait(pleaseWait, () => {
+									pleaseWait.RemoveFromSuperview ();
+									NavigationController.PopViewControllerAnimated(true);
+								});
+							}
 
 						});
-				});
+
+					}
+				};
+
+				alert.Show ();
+
 			};
 
 		}
+
 	}
 }
 

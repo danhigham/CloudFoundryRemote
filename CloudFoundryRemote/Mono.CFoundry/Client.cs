@@ -46,8 +46,15 @@ namespace Mono.CFoundry
 		{
 			_target = "https://" + target;
 			_trustAll = trustAll;
-			GetEndPointInfo ();
 		}
+
+		public Client (string target, bool trustAll, HttpErrorHandler httpErrorHandler)
+		{
+			_target = "https://" + target;
+			_trustAll = trustAll;
+			OnHttpError += httpErrorHandler;
+		}
+
 
 		public string AuthToken { get { return _authToken; } }
 
@@ -66,6 +73,13 @@ namespace Mono.CFoundry
 			SetTokenFromResponse (response);
 
 			return true;
+		}
+
+		public void Logout ()
+		{
+			_authType = _authToken = _refreshToken = null;
+			_trustAll = false;
+			_tokenExpiresAt = DateTime.Now;
 		}
 
 		public List<Organization> GetOrgs()
@@ -152,10 +166,14 @@ namespace Mono.CFoundry
 			return Put (url, requestBody);
 		}
 
-		private void GetEndPointInfo() 
+		public bool GetEndPointInfo() 
 		{
 			var response = Get<JObject> (_target + "/info");
-			_uaaTarget = response["authorization_endpoint"].ToString();
+
+			if (response ["error"] != null) return false;
+
+			_uaaTarget = response ["authorization_endpoint"].ToString ();
+			return true;
 		}
 
 		private void RefreshToken() 
